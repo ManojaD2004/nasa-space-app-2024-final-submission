@@ -22,11 +22,12 @@ Postprocessing & Drei: Used to enhance visuals with post-processing effects (e.g
 
 ## Run Locally
 
-Make sure you have git and nodejs installed in your system, clone the project
+Make sure you have **git** and **nodejs** installed in your system, clone the project
 
 ```bash
-  git clone https://github.com/ManojaD2004/nasa-space-app-2024-final-submission.git
+git clone https://github.com/ManojaD2004/nasa-space-app-2024-final-submission.git
 ```
+### 1. Run the Client
 
 Go to the project directory
 
@@ -42,14 +43,14 @@ Install dependencies
 ```bash
   npm run dev
 ```
-or
+If you need production build
 ```bash
   npm run build
 ```
 ```bash
   npm Start
 ```
-
+### 2. Run the Server
 Start the server
 
 ```bash
@@ -62,9 +63,28 @@ Start the server
   node server.js
 ```
 
-Start with Docker
+### 3. Alternative: Start with Docker
+Be in the main directory, and run this command
 ```bash
   docker compose up
+```
+
+### 3. Python Algorithm Function
+If you want to see Python detection Algorithm function, 
+Be in the main directory, and run this command
+```bash
+  cd extra/python
+```
+You can delete data_clean.json, table_clean.csv, data.json, result.json, result_log.txt. 
+
+Have main.py, convert.py, and table.csvtable.csv is the main data given by NASA. 
+
+First run the convert.py and then main.py. See the changes.
+```bash
+  python convert.py
+```
+```bash
+  python main.py
 ```
 
 ## Tech Stack
@@ -87,7 +107,6 @@ NodeJS, ExpressJS, Python (for algorithm function that calculates if the planet 
 
 and many other dependencies.
 
-
 ## Demo
 
 You can view our project live here:
@@ -101,6 +120,4 @@ https://youtube.com/
 PPT presentation: 
 
 https://docs.google.com/presentation/d/116jPHr5646btvyXds6QsIfEes21duy2d/edit#slide=id.p1
-
-
 

@@ -2,7 +2,7 @@ import math
 import csv
 import json
 
-IS_LOGGING = False
+IS_LOGGING = True
 SOLAR_RADIUS = 6.957e8
 EARTH_RADIUS = 6.371e6
 AU_IN_METERS = 1.496e11
