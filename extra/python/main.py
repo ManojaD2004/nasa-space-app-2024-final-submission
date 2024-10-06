@@ -2,6 +2,7 @@ import math
 import csv
 import json
 
+IS_LOGGING = True
 SOLAR_RADIUS = 6.957e8
 EARTH_RADIUS = 6.371e6
 AU_IN_METERS = 1.496e11
@@ -68,7 +69,7 @@ def is_habitable_and_detectable(params):
 if __name__ == "__main__":
     with open('./data.json', 'r') as file:
         data = json.load(file)
-        maxNum = 5765
+        maxNum = len(data)
         resData = []
         resData1 = 0
         resData2 = 0
