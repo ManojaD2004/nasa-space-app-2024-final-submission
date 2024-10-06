@@ -32,7 +32,8 @@ function Calculator() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Convert inputs to the correct types (number)
+
+    // Prepare payload with correct types
     const payload = {
       R_star: parseFloat(inputs.R_star),
       L_star: parseFloat(inputs.L_star),
@@ -69,19 +70,13 @@ function Calculator() {
       }
 
       const output1 = await response.json();
-      console.log("Posted data:", output1.data);
-      if (output1.created == true) {
-        toast.success("Data posted successfully!");
-      }
       setOutput(output1.data);
-      if (output.result === '1') {
-        toast.success("It is a habitable planet");
-      } else if (output.result === '2') {
+
+      if (output1.result === "1" || output1.result === "2") {
         toast.success("It is a habitable planet");
       } else {
-        toast.success("It is not a habitable planet");
+        toast.error("It is not a habitable planet");
       }
-      
     } catch (error) {
       toast.error("Error posting data:", error);
     }
@@ -89,221 +84,85 @@ function Calculator() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="bg-white px-[50px] py-[70px] w-full ">
-        <div className="text-[40px] font-bold pb-[30px]">
+      <div className="bg-white px-4 md:px-[50px] py-[40px] w-full ">
+        <div className="text-[28px] md:text-[40px] font-bold pb-[20px] text-center">
           Habitable Planet Calculator:
         </div>
-        <div className="flex items-center justify-center gap-[300px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[100px]">
+          {/* Left Column */}
           <div className="flex flex-col gap-4">
-            <div>
-              <label htmlFor="R_star" className="block mb-1 text-[13px]">
-                R_star:
-              </label>
-              <input
-                id="R_star"
-                placeholder=""
-                value={inputs.R_star}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="L_star" className="block mb-1 text-[13px]">
-                L_star:
-              </label>
-              <input
-                id="L_star"
-                placeholder=""
-                value={inputs.L_star}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="T_eff" className="block mb-1 text-[13px]">
-                T_eff:
-              </label>
-              <input
-                id="T_eff"
-                placeholder=""
-                value={inputs.T_eff}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="R_planet" className="block mb-1 text-[13px]">
-                R_planet:
-              </label>
-              <input
-                id="R_planet"
-                placeholder=""
-                value={inputs.R_planet}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="M_planet" className="block mb-1 text-[13px]">
-                M_planet:
-              </label>
-              <input
-                id="M_planet"
-                placeholder=""
-                value={inputs.M_planet}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="semi_major_axis"
-                className="block mb-1 text-[13px]"
-              >
-                semi_major_axis:
-              </label>
-              <input
-                id="semi_major_axis"
-                placeholder=""
-                value={inputs.semi_major_axis}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="eccentricity" className="block mb-1 text-[13px]">
-                eccentricity:
-              </label>
-              <input
-                id="eccentricity"
-                placeholder=""
-                value={inputs.eccentricity}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="distance" className="block mb-1 text-[13px]">
-                distance:
-              </label>
-              <input
-                id="distance"
-                placeholder=""
-                value={inputs.distance}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
+            {[
+              { id: "R_star", label: "R_star" },
+              { id: "L_star", label: "L_star" },
+              { id: "T_eff", label: "T_eff" },
+              { id: "R_planet", label: "R_planet" },
+              { id: "M_planet", label: "M_planet" },
+              { id: "semi_major_axis", label: "Semi-Major Axis" },
+              { id: "eccentricity", label: "Eccentricity" },
+              { id: "distance", label: "Distance" },
+            ].map((field) => (
+              <div key={field.id}>
+                <label htmlFor={field.id} className="block mb-1 text-[13px]">
+                  {field.label}:
+                </label>
+                <input
+                  id={field.id}
+                  value={inputs[field.id]}
+                  onChange={handleInputChange}
+                  className="border rounded px-2 py-1 w-full focus:outline-none focus:border-black focus:bg-gray-100"
+                  required
+                />
+              </div>
+            ))}
           </div>
 
+          {/* Right Column */}
           <div className="flex flex-col gap-4">
-            <div>
-              <label htmlFor="inclination" className="block mb-1 text-[13px]">
-                {"inclination (Assumed value):"}
-              </label>
-              <input
-                id="inclination"
-                placeholder=""
-                value={inputs.inclination}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="albedo" className="block mb-1 text-[13px]">
-                {"albedo: (Assumed value)"}
-              </label>
-              <input
-                id="albedo"
-                placeholder=""
-                value={inputs.albedo}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="D_telescope" className="block mb-1 text-[13px]">
-                {"D_telescope: (Instrument parameter)"}
-              </label>
-              <input
-                id="D_telescope"
-                placeholder=""
-                value={inputs.D_telescope}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="wavelength" className="block mb-1 text-[13px]">
-                {"wavelength: (Instrument parameter)"}
-              </label>
-              <input
-                id="wavelength"
-                placeholder=""
-                value={inputs.wavelength}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="IWA" className="block mb-1 text-[13px]">
-                {"IWA: (Instrument parameter)"}
-              </label>
-              <input
-                id="IWA"
-                placeholder=""
-                value={inputs.IWA}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label htmlFor="OWA" className="block mb-1 text-[13px]">
-                {"OWA: (Instrument parameter)"}
-              </label>
-              <input
-                id="OWA"
-                placeholder=""
-                value={inputs.OWA}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="contrast_limit"
-                className="block mb-1 text-[13px]"
-              >
-                {"contrast_limit:: (Instrument parameter)"}
-              </label>
-              <input
-                id="contrast_limit"
-                placeholder=""
-                value={inputs.contrast_limit}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-[400px] focus:outline-none focus:border-black focus:bg-gray-100"
-              />
-            </div>
+            {[
+              { id: "inclination", label: "Inclination (Assumed)" },
+              { id: "albedo", label: "Albedo (Assumed)" },
+              { id: "D_telescope", label: "D_telescope (Instrument)" },
+              { id: "wavelength", label: "Wavelength (Instrument)" },
+              { id: "IWA", label: "IWA (Instrument)" },
+              { id: "OWA", label: "OWA (Instrument)" },
+              { id: "contrast_limit", label: "Contrast Limit (Instrument)" },
+            ].map((field) => (
+              <div key={field.id}>
+                <label htmlFor={field.id} className="block mb-1 text-[13px]">
+                  {field.label}:
+                </label>
+                <input
+                  id={field.id}
+                  value={inputs[field.id]}
+                  onChange={handleInputChange}
+                  className="border rounded px-2 py-1 w-full focus:outline-none focus:border-black focus:bg-gray-100"
+                />
+              </div>
+            ))}
           </div>
         </div>
-        <div className="flex justify-center mt-4">
+
+        {/* Submit Button */}
+        <div className="flex justify-center mt-6">
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-blue-500 text-white px-4 py-2 rounded w-full md:w-auto"
           >
             Submit
           </button>
         </div>
       </div>
-      <div className="mt-4 flex p-[50px] items-center justify-center">
-        {output.result == 1 || output.result == 2 ? (
-          <div className="text-green-600 text-[20px]">
-           
-            Calculated Result: Planet is potenitially habitable !!
+
+      {/* Output Display */}
+      <div className="mt-4 flex items-center justify-center text-center">
+        {output.result === "1" || output.result === "2" ? (
+          <div className="text-green-600 text-[18px] md:text-[20px]">
+            Calculated Result: Planet is potentially habitable!
           </div>
         ) : (
-          <div className="text-red-600">Planet is not Habitable</div>
+          <div className="text-red-600 text-[18px] md:text-[20px]">
+            Planet is not habitable.
+          </div>
         )}
       </div>
     </form>
