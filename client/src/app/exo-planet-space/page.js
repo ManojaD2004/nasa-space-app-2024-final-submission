@@ -68,7 +68,7 @@ for (let i = 0; i < resultJson.length; i++) {
   };
 }
 
-function AdjacentText({ systemName, scale=17 }) {
+function AdjacentText({ systemName, scale = 17, plaFlag = 0, setPlaOrSun }) {
   const textRef = useRef();
   const textOffset = new THREE.Vector3(50, 30, -10); // Example offset to the right of the object
 
@@ -77,7 +77,11 @@ function AdjacentText({ systemName, scale=17 }) {
   });
   const router = useRouter();
   const handleClick = () => {
-    window.open(`/exo-planet-space/planet/${systemName}`, "_blank");
+    if (plaFlag === 0) {
+      window.open(`/exo-planet-space/planet/${systemName}`, "_blank");
+    } else {
+      setPlaOrSun(1);
+    }
   };
 
   return (
@@ -203,6 +207,7 @@ function OrbitComponent({
   hostName,
   plaName,
   systemName,
+  setPlaOrSun,
   zValue = 1,
 }) {
   const ellipseCurve = new THREE.EllipseCurve(
@@ -233,7 +238,12 @@ function OrbitComponent({
       rotation={[(Math.PI / 2) * zValue, 0, 0]}
     >
       <mesh ref={boxRef} position={[0, 0, 0]}>
-        <AdjacentText systemName={plaName} scale={5} />
+        <AdjacentText
+          systemName={plaName}
+          scale={5}
+          plaFlag={1}
+          setPlaOrSun={setPlaOrSun}
+        />
         <SmallSphereObj
           colorMapLoc={colorMapLoc}
           scaleRatio={scaleRatio}
@@ -297,6 +307,7 @@ function ThreeDComp({
         planetRef={planetRef}
         hostName={hostName}
         systemName={systemName}
+        setPlaOrSun={setPlaOrSun}
         plaName={plaName}
       />
     </group>
