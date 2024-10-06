@@ -67,7 +67,6 @@ def is_habitable_and_detectable(params):
         return 3
 if __name__ == "__main__":
     args = list(map(float, sys.argv[1:]))
-    print(args)
     params = {
         'R_star': args[0],
         'L_star': args[1],

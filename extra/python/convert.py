@@ -42,7 +42,7 @@ if __name__ == "__main__":
                 "st_spectype": newData["st_spectype"],
                 "st_mass": newData["st_mass"],
                 "st_rotp": newData["st_rotp"],
-                "ran": newData["ra"],
+                "ra": newData["ra"],
                 "dec": newData["dec"],
                 "sy_pmra": newData["sy_pmra"],
                 "sy_pmdec": newData["sy_pmdec"],

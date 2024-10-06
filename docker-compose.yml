@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  client:
+    image: next-client-v1
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+  node-server:
+    image: node-server-v1
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
