@@ -233,6 +233,7 @@ function OrbitComponent({
       rotation={[(Math.PI / 2) * zValue, 0, 0]}
     >
       <mesh ref={boxRef} position={[0, 0, 0]}>
+        <AdjacentText systemName={plaName} scale={5} />
         <SmallSphereObj
           colorMapLoc={colorMapLoc}
           scaleRatio={scaleRatio}
