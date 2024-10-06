@@ -52,8 +52,10 @@ function Calculator() {
     };
 
     try {
+      const linkApi =
+        "https://5000-idx-nasa-space-app-2024-final-submissio-1728298013321.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev";
       const response = await fetch(
-        `http://localhost:5000/habitable-exoplanet-calculator`,
+        `${linkApi}/habitable-exoplanet-calculator`,
         {
           method: "POST",
           headers: {
