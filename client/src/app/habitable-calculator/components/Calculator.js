@@ -52,8 +52,7 @@ function Calculator() {
     };
 
     try {
-      const linkApi =
-        "https://5000-idx-nasa-space-app-2024-final-submissio-1728298013321.cluster-a3grjzek65cxex762e4mwrzl46.cloudworkstations.dev";
+      const linkApi = "http://hep.machalang.com:5000";
       const response = await fetch(
         `${linkApi}/habitable-exoplanet-calculator`,
         {
