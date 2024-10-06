@@ -31,7 +31,7 @@ const SPACE_SIZE = 3;
 const ORBIT_TO_SUN = 0.003;
 const DISTANCE_FROM_EARTH_TO_SUN = 23479.8304;
 const SUN_RADIUS = 109.2983;
-const LIMIT_VALUE = 20;
+const LIMIT_VALUE = resultJson.length;
 
 const DEFAULT_DATA = {
   Sun: {
