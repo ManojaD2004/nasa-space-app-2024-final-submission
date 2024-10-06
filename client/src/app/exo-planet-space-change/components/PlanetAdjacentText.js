@@ -10,9 +10,9 @@ function PlanetAdjacentText({ displayName, scale, setLeva, plaOrSun }) {
   });
   const handleClick = () => {
     if (plaOrSun) {
-      window.open(
-        `/exo-planet-comparision?planet1=${encodeURIComponent(displayName)}`
-      );
+      // window.open(
+      //   `/exo-planet-comparision?planet1=${encodeURIComponent(displayName)}`
+      // );
     } else {
       setLeva({
         "Change View (Planet/Star)": true,
