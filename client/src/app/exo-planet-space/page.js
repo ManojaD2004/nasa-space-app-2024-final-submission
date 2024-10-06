@@ -89,6 +89,75 @@ function AdjacentText({ systemName }) {
   );
 }
 
+function BigSphereObj1({ position, zoomData, setZoomData }) {
+  const meshRef = useRef();
+  const [hover, setHover] = useState(false);
+  const [textPosition, setTextPosition] = useState(null); // State to hold the text position
+
+  useEffect(() => {
+    document.body.style.cursor = hover ? "pointer" : "grab";
+  }, [hover]);
+
+  // Zoom effect on click
+  useFrame((state) => {
+    const step = 0.05;
+    const zoomDistance = 200; // Distance to stop the zoom
+
+    // Only handle zoom if zoomData is active
+    if (zoomData.active && zoomData.target === "big") {
+      const targetPosition = new THREE.Vector3(
+        position[0],
+        position[1],
+        position[2] + zoomDistance
+      );
+
+      const vec = new THREE.Vector3();
+      vec.lerpVectors(state.camera.position, targetPosition, step);
+      state.camera.position.copy(vec);
+      state.camera.lookAt(meshRef.current.position); // Look at the object
+    }
+
+    state.camera.updateProjectionMatrix();
+  });
+
+  // Trigger zoom and update zoom data
+  const zoomToView = () => {
+    if (zoomData.target === "big") {
+      setZoomData({ target: null, active: false });
+    } else {
+      setZoomData({ target: "big", active: true, position });
+    }
+  };
+
+  return (
+    <mesh
+      position={position}
+      ref={meshRef}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => setHover(false)}
+      onClick={zoomToView}
+    >
+      <pointLight
+        position={[0, 0, 0]}
+        angle={0.15}
+        penumbra={1}
+        decay={0}
+        intensity={Math.PI * 2}
+      />
+      <sphereGeometry args={[20, 64, 64]} />
+      <meshStandardMaterial
+        map={colorMap}
+        emissive="orange"
+        emissiveIntensity={2}
+        toneMapped={false}
+      />
+
+      {/* Only render AdjacentText if textPosition is defined */}
+      {textPosition && <AdjacentText targetPosition={textPosition} />}
+    </mesh>
+  );
+}
+
 function BigSphereObj({
   scaleRatio,
   sunRef,
@@ -109,15 +178,15 @@ function BigSphereObj({
       {hostName !== systemName && (
         <Html>
           <div className={poppinsFont1.className}>
-          <div
-            onClick={() => {
-              setHostName(systemName);
-              setPlaOrSun(0);
-            }}
-            className="text-white text-lg select-none cursor-pointer"
-          >
-            {systemName}
-          </div>
+            <div
+              onClick={() => {
+                setHostName(systemName);
+                setPlaOrSun(0);
+              }}
+              className="text-white text-lg select-none cursor-pointer"
+            >
+              {systemName}
+            </div>
           </div>
         </Html>
       )}
@@ -311,32 +380,32 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
   useThree(({ camera }) => {
     cameraRef.current = camera;
   });
-  useEffect(() => {
-    if (extractValue === 1 && planetRef.current && cameraRef.current) {
-      const target = new THREE.Vector3();
-      const target1 = new THREE.Vector3();
-      sunRef.current.getWorldPosition(target1);
-      planetRef.current.getWorldPosition(target);
-      const cameraDistance = 16;
-      const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
-      cameraRef.current.position.copy(target.clone().add(cameraOffset));
-      cameraRef.current.lookAt(target1);
-      cameraRef.current.rotation.set(0, Math.PI / 2, 0);
-    } else if (
-      extractValue === 0 &&
-      sunRef.current &&
-      cameraRef.current &&
-      controlsRef.current
-    ) {
-      const target = new THREE.Vector3();
-      sunRef.current.getWorldPosition(target);
-      const cameraDistance = 5;
-      const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
-      cameraRef.current.position.copy(target.clone().add(cameraOffset));
-      cameraRef.current.lookAt(target);
-      cameraRef.current.rotation.set(0, -Math.PI / 2, 0);
-    }
-  }, [extractValue, hostName]);
+  // useEffect(() => {
+  //   if (extractValue === 1 && planetRef.current && cameraRef.current) {
+  //     const target = new THREE.Vector3();
+  //     const target1 = new THREE.Vector3();
+  //     sunRef.current.getWorldPosition(target1);
+  //     planetRef.current.getWorldPosition(target);
+  //     const cameraDistance = 16;
+  //     const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
+  //     cameraRef.current.position.copy(target.clone().add(cameraOffset));
+  //     cameraRef.current.lookAt(target1);
+  //     cameraRef.current.rotation.set(0, Math.PI / 2, 0);}
+  //   // } else if (
+  //   //   extractValue === 0 &&
+  //   //   sunRef.current &&
+  //   //   cameraRef.current &&
+  //   //   controlsRef.current
+  //   // ) {
+  //   //   const target = new THREE.Vector3();
+  //   //   sunRef.current.getWorldPosition(target);
+  //   //   const cameraDistance = 5;
+  //   //   const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
+  //   //   cameraRef.current.position.copy(target.clone().add(cameraOffset));
+  //   //   cameraRef.current.lookAt(target);
+  //   //   cameraRef.current.rotation.set(0, -Math.PI / 2, 0);
+  //   // }
+  // }, [extractValue, hostName]);
 
   useFrame((state, delta) => {
     if (controlsRef.current && cameraRef.current && sunRef.current) {
@@ -370,6 +439,21 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
       sunRef.current.getWorldPosition(target);
       controlsRef.current.target.copy(target);
       controlsRef.current.update();
+      if (sunRef.current && cameraRef.current) {
+        const step = 0.05;
+        const zoomDistance = 200;
+        console.log(sunRef.current);
+        const targetPosition = new THREE.Vector3(
+          sunRef.current.position[0],
+          sunRef.current.position[1],
+          sunRef.current.position[2] + zoomDistance
+        );
+        const vec = new THREE.Vector3();
+        vec.lerpVectors(cameraRef.current.position, targetPosition, step);
+        state.camera.position.copy(vec);
+        state.camera.lookAt(sunRef.current.position);
+        state.camera.updateProjectionMatrix();
+      }
     }
   });
   return (
@@ -387,14 +471,14 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
       </Effects>
       <BakeShadows />
       <Stars
-          radius={10000}
-          count={50000}
-          depth={6000}
-          factor={200}
-          fade={true}
-          speed={1}
-        />
-       
+        radius={10000}
+        count={50000}
+        depth={6000}
+        factor={200}
+        fade={true}
+        speed={1}
+      />
+
       {listOfExo.map((ele, index) => (
         <ThreeDComp
           key={index}
@@ -420,9 +504,9 @@ export default function Home() {
   const [hostName, setHostName] = useState("Sun");
   const [plaOrSun, setPlaOrSun] = useState(0);
   const listOfExo = Object.keys(DEFAULT_DATA).slice(0, LIMIT_VALUE);
-  for (let i = 0; i < listOfExo.length; i++) {
-    console.log(DEFAULT_DATA[listOfExo[i]]);
-  }
+  // for (let i = 0; i < listOfExo.length; i++) {
+  //   console.log(DEFAULT_DATA[listOfExo[i]]);
+  // }
   return (
     <main className="h-screen m-[unset] relative bg-slate-950">
       <div className="z-[9999] fixed top-0 right-0 m-3 rounded-xl h-auto w-44 bg-red-700 p-4 text-white">
