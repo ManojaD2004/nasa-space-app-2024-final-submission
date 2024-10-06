@@ -75,8 +75,8 @@ function AdjacentText({
   const textRef = useRef();
   const textOffset = new THREE.Vector3(
     (scale / 17) * 50,
-    (scale / 17) * 30,
-    (scale / 17) * -10
+    (scale / 17) * 50,
+    (scale / 17) * -20
   );
 
   useFrame(({ camera }) => {
@@ -115,6 +115,7 @@ function BigSphereObj({
   setLeva,
   hostName,
   systemName,
+  displayPlaText,
   colorMapLoc = "/texture/solar/sun/2k_sun.jpg",
   emissiveColor = "orange",
 }) {
@@ -125,7 +126,7 @@ function BigSphereObj({
   });
   return (
     <mesh ref={sunRef}>
-      {hostName !== systemName && (
+      {hostName !== systemName && displayPlaText === true && (
         <Html>
           <div className={poppinsFont.className}>
             <div
@@ -148,7 +149,7 @@ function BigSphereObj({
           angle={0.15}
           penumbra={1}
           decay={0}
-          intensity={hostName === systemName ? Math.PI * 0.4 * scaleRatio : 0}
+          intensity={hostName === systemName ? Math.PI * 0.8 * scaleRatio : 0}
         />
         <sphereGeometry
           args={[SPACE_SIZE * ORBIT_TO_SUN * SUN_RADIUS * scaleRatio, 64, 64]}
@@ -156,7 +157,7 @@ function BigSphereObj({
         <meshStandardMaterial
           map={colorMap}
           emissive={emissiveColor}
-          emissiveIntensity={hostName === systemName ? 2 * scaleRatio : 0}
+          emissiveIntensity={hostName === systemName ? 2 : 0}
           toneMapped={false}
         />
       </mesh>
@@ -217,6 +218,7 @@ function OrbitComponent({
   plaName,
   systemName,
   setLeva,
+  displayPlaText,
   zValue = 1,
 }) {
   const ellipseCurve = new THREE.EllipseCurve(
@@ -242,7 +244,7 @@ function OrbitComponent({
   return (
     <mesh position={[0, 0, 0]} rotation={[(Math.PI / 2) * zValue, 0, 0]}>
       <mesh ref={boxRef} position={[0, 0, 0]}>
-        {hostName === systemName && (
+        {hostName === systemName && displayPlaText === true && (
           <mesh>
             <AdjacentText
               displayName={plaName}
@@ -287,6 +289,7 @@ function ThreeDComp({
   setLeva,
   orbitRad,
   plaName,
+  displayPlaText,
 }) {
   const earthOrbit = DISTANCE_FROM_EARTH_TO_SUN * orbitRad;
   const colorMapLoc1 =
@@ -305,6 +308,7 @@ function ThreeDComp({
         systemName={systemName}
         setLeva={setLeva}
         plaName={plaName}
+        displayPlaText={displayPlaText}
       />
       <OrbitComponent
         xRadius={earthOrbit}
@@ -319,12 +323,13 @@ function ThreeDComp({
         systemName={systemName}
         setLeva={setLeva}
         plaName={plaName}
+        displayPlaText={displayPlaText}
       />
     </group>
   );
 }
 
-function Wrapper3D({ plaOrSun, hostName, setLeva }) {
+function Wrapper3D({ plaOrSun, hostName, setLeva, zoomSpeed, displayPlaText }) {
   const controlsRef = useRef();
   const planetRef = useRef();
   const cameraRef = useRef();
@@ -333,15 +338,11 @@ function Wrapper3D({ plaOrSun, hostName, setLeva }) {
   const listOfExo = Object.keys(DEFAULT_DATA).slice(0, LIMIT_VALUE);
   const starRef = useRef();
   const stopRef = useRef(true);
-  const timeRef = useRef(null);
   useThree(({ camera }) => {
     cameraRef.current = camera;
   });
   useEffect(() => {
     stopRef.current = true;
-    if (timeRef.current !== null) {
-      clearTimeout(timeRef.current);
-    }
     if (plaOrSun === true && planetRef.current && cameraRef.current) {
       const target = new THREE.Vector3();
       const target1 = new THREE.Vector3();
@@ -353,9 +354,6 @@ function Wrapper3D({ plaOrSun, hostName, setLeva }) {
       cameraRef.current.lookAt(target1);
       cameraRef.current.rotation.set(0, Math.PI / 2, 0);
     }
-    timeRef.current = setTimeout(() => {
-      stopRef.current = false;
-    }, 5000);
   }, [extractValue, hostName]);
 
   useFrame((state, delta) => {
@@ -365,9 +363,10 @@ function Wrapper3D({ plaOrSun, hostName, setLeva }) {
       controlsRef.current &&
       cameraRef.current
     ) {
+      const step = zoomSpeed;
       const target = new THREE.Vector3();
       planetRef.current.getWorldPosition(target);
-      controlsRef.current.target.lerp(target, 0.1);
+      controlsRef.current.target.lerp(target, step);
       controlsRef.current.update();
       const target1 = controlsRef.current.target;
       const distance = cameraRef.current.position.distanceTo(target1);
@@ -392,12 +391,11 @@ function Wrapper3D({ plaOrSun, hostName, setLeva }) {
       starRef.current
     ) {
       if (sunRef.current && cameraRef.current && stopRef.current === true) {
-        const step = 0.03;
+        const step = zoomSpeed;
         const target1 = new THREE.Vector3();
         sunRef.current.getWorldPosition(target1);
         starRef.current.position.set(target1.x, target1.y, target1.z);
-        const cameraDistance = 20; // size: { value: 20, min: 0, max: 98, step: 1 },
-        // image: { image: undefined },
+        const cameraDistance = 20;
         const cameraOffset = new THREE.Vector3(
           cameraDistance,
           cameraDistance / 4,
@@ -427,8 +425,11 @@ function Wrapper3D({ plaOrSun, hostName, setLeva }) {
         zoomToCursor={true}
         zoomSpeed={5}
         rotateSpeed={2}
+        onEnd={() => {
+          stopRef.current = false;
+        }}
       />
-      <ambientLight intensity={Math.PI / 2} />
+      <ambientLight intensity={Math.PI / 20} />
       <Effects disableGamma>
         <unrealBloomPass threshold={1} strength={1.0} radius={0.5} />
       </Effects>
@@ -457,6 +458,7 @@ function Wrapper3D({ plaOrSun, hostName, setLeva }) {
           plaName={DEFAULT_DATA[ele].pl_name}
           setLeva={setLeva}
           orbitRad={DEFAULT_DATA[ele].orbit_distance}
+          displayPlaText={displayPlaText}
         />
       ))}
     </>
@@ -478,6 +480,15 @@ export default function Home() {
       "Change View (Planet/Star)": {
         value: false,
       },
+      "Display Planet Text": {
+        value: true,
+      },
+      "Speed Of Zoom": {
+        value: 0.03,
+        min: 0.01,
+        max: 0.1,
+        step: 0.01,
+      },
     }),
   }));
   console.log(leavCont);
@@ -491,6 +502,8 @@ export default function Home() {
           hostName={leavCont["Select Planet"]}
           plaOrSun={leavCont["Change View (Planet/Star)"]}
           setLeva={setLeva}
+          zoomSpeed={leavCont["Speed Of Zoom"]}
+          displayPlaText={leavCont["Display Planet Text"]}
         />
       </Canvas>
     </main>
