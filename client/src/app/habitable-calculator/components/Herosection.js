@@ -1,12 +1,16 @@
 import React from "react";
 import { Poppins } from "next/font/google";
+import Header from "./Header";
 
 const poppinsFont = Poppins({ subsets: ["latin"], weight: "400" });
 const poppinsFont1 = Poppins({ subsets: ["latin"], weight: "700" });
 
 const Herosection = () => {
   return (
+    <div>
+      <Header/>
     <div className="pt-[60px]">
+     
       <div className="relative w-full h-screen bg-cover bg-no-repeat bg-[url('https://science.nasa.gov/wp-content/uploads/2024/10/moon-and-pacific-ocean-earth-photo-from-iss-matthew-dominic.jpg?w=2560&format=webp')] bg-[center_20%] flex items-center">
         {/* Black Filter Overlay */}
         <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -49,6 +53,7 @@ const Herosection = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

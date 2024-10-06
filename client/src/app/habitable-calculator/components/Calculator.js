@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 
 function Calculator() {
+  const [output,setOutput] = useState(0)
   const [inputs, setInputs] = useState({
     R_star: "",
     L_star: "",
@@ -31,6 +32,25 @@ function Calculator() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+      // Convert inputs to the correct types (number)
+      const payload = {
+        R_star: parseFloat(inputs.R_star),
+        L_star: parseFloat(inputs.L_star),
+        T_eff: parseInt(inputs.T_eff, 10),
+        R_planet: parseFloat(inputs.R_planet),
+        M_planet: parseFloat(inputs.M_planet),
+        semi_major_axis: parseFloat(inputs.semi_major_axis),
+        eccentricity: parseFloat(inputs.eccentricity),
+        inclination: parseFloat(inputs.inclination),
+        albedo: parseFloat(inputs.albedo),
+        distance: parseFloat(inputs.distance),
+        D_telescope: parseFloat(inputs.D_telescope),
+        wavelength: parseFloat(inputs.wavelength),
+        IWA: parseFloat(inputs.IWA),
+        OWA: parseFloat(inputs.OWA),
+        contrast_limit: parseFloat(inputs.contrast_limit),
+      };
+  
 
     try {
       const response = await fetch(
@@ -40,7 +60,8 @@ function Calculator() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(inputs),
+          body: JSON.stringify(payload),
+          
         }
       );
 
@@ -48,18 +69,20 @@ function Calculator() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
-      console.log("Posted data:", result);
-      if (result.created == true) {
+      const output1 = await response.json();
+      console.log("Posted data:", output1.data);
+      if (output1.created == true) {
         toast.success("Data posted successfully!");
-        window.location.reload();
+     
       }
+      setOutput(output1.data);
     } catch (error) {
       toast.error("Error posting data:", error);
     }
   };
 
   return (
+    
     <form onSubmit={handleSubmit}>
       <div className="bg-white px-[50px] py-[70px] w-full ">
         <div className="text-[40px] font-medium pb-[30px]">
@@ -267,6 +290,17 @@ function Calculator() {
           </button>
         </div>
       </div>
+      <div className="mt-4 flex p-[50px] items-center justify-center">
+        {output.result == 1 || output.result==2? (
+          <div className="text-green-600 text-[20px]">
+            {/* Display the output (which is a number) */}
+            Calculated Result: Planet is potenitially  habitable !!
+          </div>
+        ) : (
+          <div className="text-red-600">Planet is not Habitable</div>
+        )}
+      </div>
+  
     </form>
   );
 }
