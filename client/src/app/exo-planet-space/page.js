@@ -72,9 +72,9 @@ for (let i = 0; i < resultJson.length; i++) {
 function AdjacentText({ systemName, scale = 17, plaFlag = 0, setPlaOrSun }) {
   const textRef = useRef();
   const textOffset = new THREE.Vector3(
-    (17 / scale) * 50,
-    (17 / scale) * 30,
-    (17 / scale) * -10
+    (scale / 17) * 50,
+    (scale / 17) * 30,
+    (scale / 17) * -10
   ); // Example offset to the right of the object
 
   useFrame(({ camera }) => {
@@ -144,7 +144,7 @@ function BigSphereObj({
           angle={0.15}
           penumbra={1}
           decay={0}
-          intensity={hostName === systemName ? Math.PI * 0.2 * scaleRatio : 0}
+          intensity={hostName === systemName ? Math.PI * 0.4 * scaleRatio : 0}
         />
         <sphereGeometry
           args={[SPACE_SIZE * ORBIT_TO_SUN * SUN_RADIUS * scaleRatio, 64, 64]}
@@ -253,12 +253,14 @@ function OrbitComponent({
             />
           </mesh>
         )}
-        <SmallSphereObj
-          colorMapLoc={colorMapLoc}
-          scaleRatio={scaleRatio}
-          planetRef={planetRef}
-          plaName={plaName}
-        />
+        {hostName === systemName && (
+          <SmallSphereObj
+            colorMapLoc={colorMapLoc}
+            scaleRatio={scaleRatio}
+            planetRef={planetRef}
+            plaName={plaName}
+          />
+        )}
       </mesh>
       <mesh>
         <Line
@@ -475,10 +477,9 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
 
 const plaArray = Object.keys(DEFAULT_DATA);
 
-const planetSelect = {
-}
+const planetSelect = {};
 for (let i = 0; i < plaArray.length; i++) {
-  planetSelect[plaArray[i]] = plaArray[i]
+  planetSelect[plaArray[i]] = plaArray[i];
 }
 export default function Home() {
   const [hostName, setHostName] = useState("Sun");
