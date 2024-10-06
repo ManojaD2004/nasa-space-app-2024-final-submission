@@ -62,6 +62,11 @@ Start the server
   node server.js
 ```
 
+Start with Docker
+```bash
+  docker compose up
+```
+
 ## Tech Stack
 
 **Client:** [![](https://skillicons.dev/icons?i=threejs,react,tailwindcss,nextjs)](https://skillicons.dev)
