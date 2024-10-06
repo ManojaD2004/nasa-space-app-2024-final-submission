@@ -377,35 +377,37 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
   const distanceRef1 = useRef(1);
   const extractValue = plaOrSun;
   const listOfExo = Object.keys(DEFAULT_DATA).slice(0, LIMIT_VALUE);
+  
   useThree(({ camera }) => {
     cameraRef.current = camera;
   });
-  // useEffect(() => {
-  //   if (extractValue === 1 && planetRef.current && cameraRef.current) {
-  //     const target = new THREE.Vector3();
-  //     const target1 = new THREE.Vector3();
-  //     sunRef.current.getWorldPosition(target1);
-  //     planetRef.current.getWorldPosition(target);
-  //     const cameraDistance = 16;
-  //     const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
-  //     cameraRef.current.position.copy(target.clone().add(cameraOffset));
-  //     cameraRef.current.lookAt(target1);
-  //     cameraRef.current.rotation.set(0, Math.PI / 2, 0);}
-  //   // } else if (
-  //   //   extractValue === 0 &&
-  //   //   sunRef.current &&
-  //   //   cameraRef.current &&
-  //   //   controlsRef.current
-  //   // ) {
-  //   //   const target = new THREE.Vector3();
-  //   //   sunRef.current.getWorldPosition(target);
-  //   //   const cameraDistance = 5;
-  //   //   const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
-  //   //   cameraRef.current.position.copy(target.clone().add(cameraOffset));
-  //   //   cameraRef.current.lookAt(target);
-  //   //   cameraRef.current.rotation.set(0, -Math.PI / 2, 0);
-  //   // }
-  // }, [extractValue, hostName]);
+  useEffect(() => {
+    if (extractValue === 1 && planetRef.current && cameraRef.current) {
+      const target = new THREE.Vector3();
+      const target1 = new THREE.Vector3();
+      sunRef.current.getWorldPosition(target1);
+      planetRef.current.getWorldPosition(target);
+      const cameraDistance = 16;
+      const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
+      cameraRef.current.position.copy(target.clone().add(cameraOffset));
+      cameraRef.current.lookAt(target1);
+      cameraRef.current.rotation.set(0, Math.PI / 2, 0);
+    }
+    // else if (
+    //   extractValue === 0 &&
+    //   sunRef.current &&
+    //   cameraRef.current &&
+    //   controlsRef.current
+    // ) {
+    //   const target = new THREE.Vector3();
+    //   sunRef.current.getWorldPosition(target);
+    //   const cameraDistance = 5;
+    //   const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
+    //   cameraRef.current.position.copy(target.clone().add(cameraOffset));
+    //   cameraRef.current.lookAt(target);
+    //   cameraRef.current.rotation.set(0, -Math.PI / 2, 0);
+    // }
+  }, [extractValue, hostName]);
 
   useFrame((state, delta) => {
     if (controlsRef.current && cameraRef.current && sunRef.current) {
@@ -435,25 +437,23 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
       controlsRef.current.target.lerp(target, 0.1);
       controlsRef.current.update();
     } else if (extractValue === 0 && sunRef.current && controlsRef.current) {
+      if (sunRef.current && cameraRef.current) {
+        const step = 0.05;
+        const target1 = new THREE.Vector3();
+      sunRef.current.getWorldPosition(target1);
+        console.log(sunRef.current);
+        const cameraDistance = 20;
+        const cameraOffset = new THREE.Vector3(cameraDistance, cameraDistance /4, 0);
+        const vec = new THREE.Vector3();
+        vec.lerpVectors(cameraRef.current.position, target1.clone().add(cameraOffset), step);
+        cameraRef.current.position.copy(vec);
+        cameraRef.current.lookAt(sunRef.current.position);
+        cameraRef.current.updateProjectionMatrix();
+      }
       const target = new THREE.Vector3();
       sunRef.current.getWorldPosition(target);
       controlsRef.current.target.copy(target);
       controlsRef.current.update();
-      if (sunRef.current && cameraRef.current) {
-        const step = 0.05;
-        const zoomDistance = 200;
-        console.log(sunRef.current);
-        const targetPosition = new THREE.Vector3(
-          sunRef.current.position[0],
-          sunRef.current.position[1],
-          sunRef.current.position[2] + zoomDistance
-        );
-        const vec = new THREE.Vector3();
-        vec.lerpVectors(cameraRef.current.position, targetPosition, step);
-        state.camera.position.copy(vec);
-        state.camera.lookAt(sunRef.current.position);
-        state.camera.updateProjectionMatrix();
-      }
     }
   });
   return (
