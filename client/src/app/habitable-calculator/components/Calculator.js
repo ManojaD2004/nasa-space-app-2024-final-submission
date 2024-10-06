@@ -81,7 +81,7 @@ function Calculator() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="bg-white px-[50px] py-[70px] w-full ">
-        <div className="text-[40px] font-medium pb-[30px]">
+        <div className="text-[40px] font-bold pb-[30px]">
           Habitable Planet Calculator:
         </div>
         <div className="flex items-center justify-center gap-[300px]">
