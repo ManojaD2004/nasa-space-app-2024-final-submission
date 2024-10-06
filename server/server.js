@@ -10,6 +10,10 @@ app.listen(5000, () => {
   console.log("Server has started on port 5000");
 });
 
+app.get("/hello", (req, res) => {
+  res.send("Hello TIger!");
+})
+
 app.post("/habitable-exoplanet-calculator", async (req, res) => {
   try {
     const {
