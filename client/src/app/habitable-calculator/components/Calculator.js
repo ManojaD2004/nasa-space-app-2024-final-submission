@@ -75,6 +75,14 @@ function Calculator() {
         toast.success("Data posted successfully!");
       }
       setOutput(output1.data);
+      if (output.result === '1') {
+        toast.success("It is a habitable planet");
+      } else if (output.result === '2') {
+        toast.success("It is a habitable planet");
+      } else {
+        toast.success("It is not a habitable planet");
+      }
+      
     } catch (error) {
       toast.error("Error posting data:", error);
     }
@@ -292,7 +300,7 @@ function Calculator() {
       <div className="mt-4 flex p-[50px] items-center justify-center">
         {output.result == 1 || output.result == 2 ? (
           <div className="text-green-600 text-[20px]">
-            {/* Display the output (which is a number) */}
+           
             Calculated Result: Planet is potenitially habitable !!
           </div>
         ) : (
