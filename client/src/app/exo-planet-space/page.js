@@ -340,6 +340,10 @@ function ThreeDComp({
 }) {
   const earthOrbit = DISTANCE_FROM_EARTH_TO_SUN * orbitRad;
   const extractValue = plaOrSun;
+  const colorMapLoc1 =
+    systemName === "Sun"
+      ? "/texture/solar/earth/2k_earth_daymap.jpg"
+      : "/texture/solar/mars/2k_mars.jpg";
   return (
     <group position={position}>
       {hostName === systemName && <AdjacentText systemName={systemName} />}
@@ -354,7 +358,7 @@ function ThreeDComp({
       <OrbitComponent
         xRadius={earthOrbit}
         yRadius={earthOrbit}
-        colorMapLoc={"/texture/solar/earth/2k_earth_daymap.jpg"}
+        colorMapLoc={colorMapLoc1}
         speedPla={0.01}
         scaleRatio={
           extractValue === 0 ? planetScale * ORBIT_TO_SUN : planetScale
@@ -377,11 +381,17 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
   const distanceRef1 = useRef(1);
   const extractValue = plaOrSun;
   const listOfExo = Object.keys(DEFAULT_DATA).slice(0, LIMIT_VALUE);
-  
+  const starRef = useRef();
+  const stopRef = useRef(true);
+  const timeRef = useRef(null);
   useThree(({ camera }) => {
     cameraRef.current = camera;
   });
   useEffect(() => {
+    stopRef.current = true;
+//     if (timeRef.current !== null) {
+// clearTimeout(timeRef.current);     
+//     }
     if (extractValue === 1 && planetRef.current && cameraRef.current) {
       const target = new THREE.Vector3();
       const target1 = new THREE.Vector3();
@@ -393,19 +403,11 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
       cameraRef.current.lookAt(target1);
       cameraRef.current.rotation.set(0, Math.PI / 2, 0);
     }
-    // else if (
-    //   extractValue === 0 &&
-    //   sunRef.current &&
-    //   cameraRef.current &&
-    //   controlsRef.current
-    // ) {
-    //   const target = new THREE.Vector3();
-    //   sunRef.current.getWorldPosition(target);
-    //   const cameraDistance = 5;
-    //   const cameraOffset = new THREE.Vector3(cameraDistance, 0, 0);
-    //   cameraRef.current.position.copy(target.clone().add(cameraOffset));
-    //   cameraRef.current.lookAt(target);
-    //   cameraRef.current.rotation.set(0, -Math.PI / 2, 0);
+    // return () => {
+    //   timeRef.current = setTimeout(() => {
+
+    //     stopRef.current = false;
+    //   }, 3000);
     // }
   }, [extractValue, hostName]);
 
@@ -436,16 +438,26 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
       planetRef.current.getWorldPosition(target);
       controlsRef.current.target.lerp(target, 0.1);
       controlsRef.current.update();
-    } else if (extractValue === 0 && sunRef.current && controlsRef.current) {
-      if (sunRef.current && cameraRef.current) {
-        const step = 0.05;
+    } else if (extractValue === 0 && sunRef.current && controlsRef.current && starRef.current) {
+      if (sunRef.current && cameraRef.current && stopRef.current === true) {
+        const step = 0.03;
         const target1 = new THREE.Vector3();
-      sunRef.current.getWorldPosition(target1);
-        console.log(sunRef.current);
+        sunRef.current.getWorldPosition(target1);
+        // console.log(starRef.current);
+        starRef.current.position.set(target1.x, target1.y, target1.z);
+        // console.log(sunRef.current);
         const cameraDistance = 20;
-        const cameraOffset = new THREE.Vector3(cameraDistance, cameraDistance /4, 0);
+        const cameraOffset = new THREE.Vector3(
+          cameraDistance,
+          cameraDistance / 4,
+          0
+        );
         const vec = new THREE.Vector3();
-        vec.lerpVectors(cameraRef.current.position, target1.clone().add(cameraOffset), step);
+        vec.lerpVectors(
+          cameraRef.current.position,
+          target1.clone().add(cameraOffset),
+          step
+        );
         cameraRef.current.position.copy(vec);
         cameraRef.current.lookAt(sunRef.current.position);
         cameraRef.current.updateProjectionMatrix();
@@ -471,6 +483,7 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
       </Effects>
       <BakeShadows />
       <Stars
+        ref={starRef}
         radius={10000}
         count={50000}
         depth={6000}
