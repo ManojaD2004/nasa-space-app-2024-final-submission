@@ -68,25 +68,23 @@ for (let i = 0; i < resultJson.length; i++) {
   };
 }
 
-function AdjacentText({ systemName }) {
+function AdjacentText({ systemName, scale=17 }) {
   const textRef = useRef();
   const textOffset = new THREE.Vector3(50, 30, -10); // Example offset to the right of the object
 
   useFrame(({ camera }) => {
     textRef.current.lookAt(camera.position);
   });
-  const router = useRouter(); 
+  const router = useRouter();
   const handleClick = () => {
-    window.open(`/exo-planet-space/planet/${systemName}`, '_blank');
+    window.open(`/exo-planet-space/planet/${systemName}`, "_blank");
   };
 
   return (
-    
-    
     <Text
       position={textOffset}
       ref={textRef}
-      scale={[17, 17, 17]} // Adjust scale as needed
+      scale={[scale, scale, scale]} // Adjust scale as needed
       color="#cbcbcb"
       anchorX="center"
       anchorY="middle"
@@ -94,10 +92,8 @@ function AdjacentText({ systemName }) {
       cursor="pointer"
       font="/fonts/fox_version_5_by_mickeyfan123_daxvfx5.ttf"
     >
-       {systemName}
+      {systemName}
     </Text>
-    
-    
   );
 }
 
@@ -128,7 +124,7 @@ function BigSphereObj({
               }}
               className="text-white text-lg select-none cursor-pointer"
             >
-             {systemName}
+              {systemName}
             </div>
           </div>
         </Html>
@@ -139,7 +135,7 @@ function BigSphereObj({
           angle={0.15}
           penumbra={1}
           decay={0}
-          intensity={Math.PI * 0.2 * scaleRatio}
+          intensity={hostName === systemName ? Math.PI * 0.2 * scaleRatio : 0}
         />
         <sphereGeometry
           args={[SPACE_SIZE * ORBIT_TO_SUN * SUN_RADIUS * scaleRatio, 64, 64]}
@@ -147,7 +143,7 @@ function BigSphereObj({
         <meshStandardMaterial
           map={colorMap}
           emissive={emissiveColor}
-          emissiveIntensity={2 * scaleRatio}
+          emissiveIntensity={hostName === systemName ? 2 * scaleRatio : 0}
           toneMapped={false}
         />
       </mesh>
@@ -181,16 +177,6 @@ function SmallSphereObj({
         setHover(false);
       }}
     >
-      {/* {changeViewPer === true && (
-        <Html>
-          <div
-            onClick={() => setChangeView(false)}
-            className="text-white text-lg select-none cursor-pointer"
-          >
-            I am here
-          </div>
-        </Html>
-      )} */}
       <mesh rotation={[-Math.PI / 10, 0, 0]} ref={planetRef}>
         <mesh ref={meshRef1} rotation={[-Math.PI / 2, 0, 0]}>
           <sphereGeometry args={[SPACE_SIZE * scaleRatio, 64, 64]} />
@@ -295,6 +281,7 @@ function ThreeDComp({
         sunRef={sunRef}
         hostName={hostName}
         systemName={systemName}
+        plaName={plaName}
         setHostName={setHostName}
         setPlaOrSun={setPlaOrSun}
       />
