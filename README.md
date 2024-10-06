@@ -1,6 +1,7 @@
 # Habitable Exoplanets Calculator Project
 
-This project calculates the habitability of exoplanets based on various planetary and stellar parameters. It has two parts: 
+This project calculates the habitability of exoplanets based on various planetary and stellar parameters. It has two parts:
+
 - A **React frontend** (client).
 - An **Express.js and Python backend** (server).
 
@@ -14,15 +15,31 @@ This project calculates the habitability of exoplanets based on various planetar
 
 1. **Clone the repository:**
 
-   ```bash
-   git clone <repository-url>
-   cd <repository-folder>```
-2.cd client
+```bash
+git clone https://github.com/ManojaD2004/nasa-space-app-2024-final-submission.git
+cd client
+```
+
+2. **Install The Dependencies:**
+
+```bash
 npm install
-3.cd ../server
-npm install
-## Running the Project
-Run the backend (server)
+```
+
+3. **Run The Project:**
+```bash
+npm run dev
+```
+
+4. Or run in production Environment
+```bash
+npm run build
+npm run start
+```
+
+<!-- ## Running the Project -->
+
+<!-- Run the backend (server)
 cd server
 node server.js
 
@@ -33,4 +50,4 @@ npm run dev
 Folder Structure
 /client: Contains the React frontend.
 /server: Contains the Express backend and Python scripts.
-This provides the necessary setup instructions and commands to install dependencies and run the project.
+This provides the necessary setup instructions and commands to install dependencies and run the project. -->
