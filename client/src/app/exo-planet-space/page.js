@@ -33,7 +33,7 @@ const SPACE_SIZE = 3;
 const ORBIT_TO_SUN = 0.003;
 const DISTANCE_FROM_EARTH_TO_SUN = 23479.8304;
 const SUN_RADIUS = 109.2983;
-const LIMIT_VALUE = 20;
+const LIMIT_VALUE = resultJson.length;
 
 const DEFAULT_DATA = {
   Sun: {
@@ -470,14 +470,14 @@ export default function Home() {
   const listOfExo = Object.keys(DEFAULT_DATA).slice(0, LIMIT_VALUE);
   return (
     <main className="h-screen m-[unset] relative bg-slate-950">
-      <div className="z-[9999] fixed top-0 right-0 m-3 rounded-xl h-auto w-44 bg-red-700 p-4 text-white">
+      <div className="z-[9999] fixed top-0 right-0 m-3 rounded-xl  w-52 bg-red-700 p-4 text-white">
         <div
-          className="cursor-pointer font-bold"
+          className="cursor-pointer font-bold "
           onClick={() => setPlaOrSun(plaOrSun === 0 ? 1 : 0)}
         >
-          Change The View
+          {"Change The View (Planet to Sun, Sun to Planet"}
         </div>
-        <div className="text-slate-200 flex-col flex">
+        <div className="text-slate-200 flex-col h-[70vh] flex overflow-y-scroll overflow-x-hidden">
           {listOfExo.map((ele, index) => (
             <div
               key={index}
