@@ -17,7 +17,7 @@ export default function Home() {
               Habitable calculator
             </a>
             <a target="_blank" href={"/orbit-rotation"}>
-              {"Habitable calculator (Test)"}
+              {"Orbit Rotation (Test)"}
             </a>
             <a target="_blank" href={"/interactive"}>
               {"Interactivity Sphere (Test)"}
