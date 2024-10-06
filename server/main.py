@@ -65,84 +65,9 @@ def is_habitable_and_detectable(params):
         return 2
     else:
         return 3
-
-
-    # with open('./data.json', 'r') as file:
-    #     data = json.load(file)
-    #     maxNum = 5765
-    #     resData = []
-    #     resData1 = 0
-    #     resData2 = 0
-    #     for i in range(1, maxNum + 1):
-    #         newData = data[str(i)]
-    #         newDict =  {
-    #         "Row_Id": newData["rowid"],
-    #         "pl_name": newData["pl_name"],
-    #         "hostname": newData["hostname"],
-    #         "pl_letter": newData["pl_letter"],
-    #         "hd_name": newData["hd_name"],
-    #         "hip_name": newData["hip_name"],
-    #         "tic_id": newData["tic_id"],
-    #         "gaia_id": newData["gaia_id"],
-    #         "Orbital Period": newData["pl_orbper"] + " Days",
-    #         "Semi-Major Axis": newData["pl_orbsmax"] + " AU",
-    #         "Planet Radius": newData["pl_rade"] + " Earth radii",
-    #         "Planet Mass": newData["pl_bmasse"] + " Earth masses",
-    #         "Planet Density": newData["pl_dens"] + " g/cm^3",
-    #         "Equilibrium Temperature": newData["pl_eqt"] + " K",
-    #         "Orbital Eccentricity": newData["pl_orbeccen"],
-    #         "Star Name": newData["pl_name"],
-    #         "Spectral Type": newData["st_spectype"],
-    #         "Effective Temperature": newData["st_teff"] + " K",
-    #         "Stellar Radius": newData["st_rad"] + " Solar radii",
-    #         "Stellar Mass": newData["st_mass"] + " Solar masses",
-    #         "Stellar Luminosity": newData["st_lum"] + " Solar luminosities",
-    #         "Rotation Period": newData["st_rotp"] + " days",
-    #         "Distance from Earth": newData["sy_dist"] + " parsecs",
-    #         "Right Ascension": newData["ra"],
-    #         "Declination": newData["dec"],
-    #         "In Right Ascension": newData["sy_pmra"] + " mas/yr",
-    #         "In Declination": newData["sy_pmdec"] + " mas/yr",
-    #         'R_star': float(1 if newData['st_rad'] == "" else newData['st_rad']),
-    #         'L_star': 10 ** float(1 if newData['st_lum'] == "" else newData['st_lum']),
-    #         'T_eff': float(1 if newData['st_teff'] == "" else newData['st_teff']),
-    #         'R_planet': float(1 if newData['pl_rade'] == "" else newData['pl_rade']),
-    #         'M_planet': float(1 if newData['pl_bmasse'] == "" else newData['pl_bmasse']),
-    #         'semi_major_axis': float(1 if newData['pl_orbsmax'] == "" else newData['pl_orbsmax']),
-    #         'eccentricity': float(1 if newData['pl_orbeccen'] == "" else newData['pl_orbeccen']),
-    #         'inclination': 90.0,  # Assumed value
-    #         'albedo': 0.30,       # Assumed value
-    #         'distance': float(1 if newData['sy_dist'] == "" else newData['sy_dist']),
-    #         'D_telescope': 6.0,   # Instrument parameter
-    #         'wavelength': 550e-9, # Instrument parameter
-    #         'IWA': 0.050,         # Instrument parameter
-    #         'OWA': 1.000,         # Instrument parameter
-    #         'contrast_limit': 1e-10  # Instrument parameter
-    #         }
-    #         result = is_habitable_and_detectable(newDict)
-    #         if result == 1:
-    #             resData.append(newDict)
-    #             resData1 += 1
-    #             # print("Potentially habitable and characterizable with HWO.")
-    #         elif result == 2:
-    #             resData.append(newDict)
-    #             resData2 += 1 
-    #             # print("Potentially habitable but not characterizable with current HWO parameters.")
-    #         elif result == 3:
-    #             pass
-    #             # print("Not habitable based on provided parameters.")
-    #     # Serializing json
-    #     json_object = json.dumps(resData, indent=4)
-    #     print("\n\n\n")
-    #     print(len(resData), "\n\n\n")
-    #     print(resData1, "\n\n\n")
-    #     print(resData2, "\n\n\n")
-    #     # Writing to sample.json
-    #     with open("./result.json", "w") as outfile:
-    #         outfile.write(json_object)
 if __name__ == "__main__":
-    # Read arguments from command line
-    args = list(map(float, sys.argv[1:]))  # Convert all args to float
+    args = list(map(float, sys.argv[1:]))
+    print(args)
     params = {
         'R_star': args[0],
         'L_star': args[1],
@@ -160,7 +85,5 @@ if __name__ == "__main__":
         'OWA': args[13],
         'contrast_limit': args[14]
     }
-
     result = is_habitable_and_detectable(params)  # Call your main function
-    # Return the result as JSON
     print(json.dumps({"result": result}))
