@@ -19,10 +19,10 @@ const Herosection = () => {
           <br />
           <div className={poppinsFont.className}>
             <span className="text-[#b8b9bb] text-sm md:text-base">
-              Habitable planets are celestial bodies that have the right conditions to support life,<br />
-              such as liquid water, a stable atmosphere, and suitable temperatures. They exist within the<br />
-              "habitable zone" of a star, where conditions are neither too hot nor too cold<br />
-              for life to potentially thrive.
+              {`Habitable planets are celestial bodies that have the right conditions to support life,
+              such as liquid water, a stable atmosphere, and suitable temperatures. They exist within the
+              "habitable zone" of a star, where conditions are neither too hot nor too cold
+              for life to potentially thrive.`}
             </span>
           </div>
         </div>
