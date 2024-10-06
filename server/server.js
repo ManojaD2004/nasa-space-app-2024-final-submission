@@ -31,8 +31,6 @@ app.post("/habitable-exoplanet-calculator", async (req, res) => {
     } = req.body;
 
     console.log("Received data:", req.body);
-
-    // Create an array of arguments to pass to the Python script lol
     const args = [
       R_star.toString(),
       L_star.toString(),

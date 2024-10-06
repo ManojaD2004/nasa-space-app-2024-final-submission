@@ -1,7 +1,8 @@
 {
   "main": "server.js",
   "scripts": {
-    "start": "node ."
+    "start": "node .",
+    "dev": "nodemon ."
   },
   "dependencies": {
     "cors": "^2.8.5",
