@@ -34,7 +34,7 @@ const SPACE_SIZE = 3;
 const ORBIT_TO_SUN = 0.003;
 const DISTANCE_FROM_EARTH_TO_SUN = 23479.8304;
 const SUN_RADIUS = 109.2983;
-const LIMIT_VALUE = resultJson.length;
+const LIMIT_VALUE = 20;
 
 const DEFAULT_DATA = {
   Sun: {
@@ -408,7 +408,8 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
         const target1 = new THREE.Vector3();
         sunRef.current.getWorldPosition(target1);
         starRef.current.position.set(target1.x, target1.y, target1.z);
-        const cameraDistance = 20;
+        const cameraDistance = 20; // size: { value: 20, min: 0, max: 98, step: 1 },
+        // image: { image: undefined },
         const cameraOffset = new THREE.Vector3(
           cameraDistance,
           cameraDistance / 4,
@@ -478,52 +479,26 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
 const plaArray = Object.keys(DEFAULT_DATA);
 
 const planetSelect = {};
-for (let i = 0; i < plaArray.length; i++) {
+for (let i = 0; i < LIMIT_VALUE; i++) {
   planetSelect[plaArray[i]] = plaArray[i];
 }
 export default function Home() {
   const [hostName, setHostName] = useState("Sun");
   const [plaOrSun, setPlaOrSun] = useState(0);
   const leavCont = useControls({
-    // text: "TEXT",
-    // color: { value: "#ffff00", label: "color" },
-    "Select Planet": {
-      options: planetSelect,
-      onChange: (value) => {
-        // Set the hostName based on the selected planet
-        setHostName(value);
-        setPlaOrSun(0);
+    "Planet Settings": folder({
+      "Select Planet": {
+        options: planetSelect,
       },
-    },
-    // size: { value: 20, min: 0, max: 98, step: 1 },
-    // image: { image: undefined },
+      "Size of Planet (To Render)" : {
+        value: 20, min: 1, max: 98, step: 1
+      }
+    }),
   });
-  // console.log(leavCont);
+  console.log(leavCont);
   // const listOfExo = Object.keys(DEFAULT_DATA).slice(0, leavCont.size);
   return (
     <main className="h-screen m-[unset] relative bg-slate-950">
-      {/* <div className="z-[9999] fixed top-0 right-0 m-3 rounded-xl  w-52 bg-red-700 p-4 text-white">
-        <div
-          className="cursor-pointer font-bold "
-          onClick={() => setPlaOrSun(plaOrSun === 0 ? 1 : 0)}
-        >
-          {"Change The View (Planet to Sun, Sun to Planet"}
-        </div>
-        <div className="text-slate-200 flex-col h-[70vh] flex overflow-y-scroll overflow-x-hidden">
-          {listOfExo.map((ele, index) => (
-            <div
-              key={index}
-              onClick={() => {
-                setHostName(ele);
-                setPlaOrSun(0);
-              }}
-              className="text-white cursor-pointer"
-            >
-              {ele}
-            </div>
-          ))}
-        </div>
-      </div> */}
       <Canvas
         camera={{ position: [240, 120, 120], fov: 50, far: 500000, near: 1 }}
       >

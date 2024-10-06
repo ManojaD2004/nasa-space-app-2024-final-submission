@@ -52,8 +52,7 @@ function Calculator() {
     };
 
     try {
-      const linkApi =
-        "https://ec2-13-202-20-192.ap-south-1.compute.amazonaws.com";
+      const linkApi = "https://hep.machalang.com";
       const response = await fetch(
         `${linkApi}/habitable-exoplanet-calculator`,
         {
