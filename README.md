@@ -117,7 +117,7 @@ https://nasa-space-app-2024-final-submission.vercel.app/
 
 ### Demo video:
 
-https://drive.google.com/file/d/16woXkzNgsHO65phQbJaAeDmX0lWih3Z0/view?usp=sharing
+https://drive.google.com/file/d/10c2zV_csBfEZvCe-Avd9ZUCWMHQlkMwU/view?usp=sharing
 
 ### PPT presentation: 
 
