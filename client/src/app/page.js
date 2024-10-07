@@ -19,9 +19,6 @@ export default function Home() {
             <a target="_blank" href={"/orbit-rotation"}>
               {"Orbit Rotation (Test)"}
             </a>
-            <a target="_blank" href={"/interactive"}>
-              {"Interactivity Sphere (Test)"}
-            </a>
           </ul>
         </div>
       </div>
