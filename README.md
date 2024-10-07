@@ -109,15 +109,17 @@ and many other dependencies.
 
 ## Demo
 
-You can view our project live here:
+### You can view our project live here:
 
 https://nasa-space-app-2024-final-submission.vercel.app/
 
-Demo video:
+(Habitable Calculator needs local hosting because APIs cannot be hosted in the cloud due to NodeJS and Python. Use Docker, to get full experience.)
 
-https://youtube.com/
+<!-- Demo video:
 
-PPT presentation: 
+https://youtube.com/ -->
+
+### PPT presentation: 
 
 https://docs.google.com/presentation/d/116jPHr5646btvyXds6QsIfEes21duy2d/edit#slide=id.p1
 
