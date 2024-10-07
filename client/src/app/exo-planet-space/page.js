@@ -15,6 +15,7 @@ import {
   OrbitControls,
   Stars,
   Text,
+  useCursor,
   useGLTF,
 } from "@react-three/drei";
 import { Line } from "@react-three/drei";
@@ -23,6 +24,7 @@ import { UnrealBloomPass } from "three-stdlib";
 import resultJson from "@/data/result";
 extend({ UnrealBloomPass });
 import { Poppins } from "next/font/google";
+import { useRouter } from "next/navigation";
 
 const poppinsFont = Poppins({ subsets: ["latin"], weight: "400" });
 const poppinsFont1 = Poppins({ subsets: ["latin"], weight: "500" });
@@ -31,7 +33,7 @@ const SPACE_SIZE = 3;
 const ORBIT_TO_SUN = 0.003;
 const DISTANCE_FROM_EARTH_TO_SUN = 23479.8304;
 const SUN_RADIUS = 109.2983;
-const LIMIT_VALUE = resultJson.length;
+const LIMIT_VALUE = 20;
 
 const DEFAULT_DATA = {
   Sun: {
@@ -73,8 +75,14 @@ function AdjacentText({ systemName }) {
   useFrame(({ camera }) => {
     textRef.current.lookAt(camera.position);
   });
+  const router = useRouter(); 
+  const handleClick = () => {
+    window.open(`/exo-planet-space/planet/${systemName}`, '_blank');
+  };
 
   return (
+    
+    
     <Text
       position={textOffset}
       ref={textRef}
@@ -82,10 +90,14 @@ function AdjacentText({ systemName }) {
       color="#cbcbcb"
       anchorX="center"
       anchorY="middle"
+      onClick={handleClick}
+      cursor="pointer"
       font="/fonts/fox_version_5_by_mickeyfan123_daxvfx5.ttf"
     >
-      {systemName}
+       {systemName}
     </Text>
+    
+    
   );
 }
 
@@ -116,7 +128,7 @@ function BigSphereObj({
               }}
               className="text-white text-lg select-none cursor-pointer"
             >
-              {systemName}
+             {systemName}
             </div>
           </div>
         </Html>
