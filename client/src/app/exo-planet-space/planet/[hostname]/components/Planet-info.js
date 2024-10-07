@@ -10,7 +10,7 @@ const PlanetInfo = () => {
 
   console.log("router name:", routerPathname); 
   console.log("planet Name:", plName); 
-
+  
   
   const planetData = resultJson.find(item => item.hostname === plName); 
 
