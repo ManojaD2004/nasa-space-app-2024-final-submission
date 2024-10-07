@@ -25,6 +25,7 @@ import resultJson from "@/data/result";
 extend({ UnrealBloomPass });
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
+import { folder, useControls } from "leva";
 
 const poppinsFont = Poppins({ subsets: ["latin"], weight: "400" });
 const poppinsFont1 = Poppins({ subsets: ["latin"], weight: "500" });
@@ -70,7 +71,11 @@ for (let i = 0; i < resultJson.length; i++) {
 
 function AdjacentText({ systemName, scale = 17, plaFlag = 0, setPlaOrSun }) {
   const textRef = useRef();
-  const textOffset = new THREE.Vector3(50, 30, -10); // Example offset to the right of the object
+  const textOffset = new THREE.Vector3(
+    (17 / scale) * 50,
+    (17 / scale) * 30,
+    (17 / scale) * -10
+  ); // Example offset to the right of the object
 
   useFrame(({ camera }) => {
     textRef.current.lookAt(camera.position);
@@ -238,12 +243,16 @@ function OrbitComponent({
       rotation={[(Math.PI / 2) * zValue, 0, 0]}
     >
       <mesh ref={boxRef} position={[0, 0, 0]}>
-        <AdjacentText
-          systemName={plaName}
-          scale={5}
-          plaFlag={1}
-          setPlaOrSun={setPlaOrSun}
-        />
+        {hostName === systemName && (
+          <mesh>
+            <AdjacentText
+              systemName={plaName}
+              scale={5}
+              plaFlag={1}
+              setPlaOrSun={setPlaOrSun}
+            />
+          </mesh>
+        )}
         <SmallSphereObj
           colorMapLoc={colorMapLoc}
           scaleRatio={scaleRatio}
@@ -464,13 +473,35 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
   );
 }
 
+const plaArray = Object.keys(DEFAULT_DATA);
+
+const planetSelect = {
+}
+for (let i = 0; i < plaArray.length; i++) {
+  planetSelect[plaArray[i]] = plaArray[i]
+}
 export default function Home() {
   const [hostName, setHostName] = useState("Sun");
   const [plaOrSun, setPlaOrSun] = useState(0);
-  const listOfExo = Object.keys(DEFAULT_DATA).slice(0, LIMIT_VALUE);
+  const leavCont = useControls({
+    // text: "TEXT",
+    // color: { value: "#ffff00", label: "color" },
+    "Select Planet": {
+      options: planetSelect,
+      onChange: (value) => {
+        // Set the hostName based on the selected planet
+        setHostName(value);
+        setPlaOrSun(0);
+      },
+    },
+    // size: { value: 20, min: 0, max: 98, step: 1 },
+    // image: { image: undefined },
+  });
+  // console.log(leavCont);
+  // const listOfExo = Object.keys(DEFAULT_DATA).slice(0, leavCont.size);
   return (
     <main className="h-screen m-[unset] relative bg-slate-950">
-      <div className="z-[9999] fixed top-0 right-0 m-3 rounded-xl  w-52 bg-red-700 p-4 text-white">
+      {/* <div className="z-[9999] fixed top-0 right-0 m-3 rounded-xl  w-52 bg-red-700 p-4 text-white">
         <div
           className="cursor-pointer font-bold "
           onClick={() => setPlaOrSun(plaOrSun === 0 ? 1 : 0)}
@@ -491,7 +522,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
       <Canvas
         camera={{ position: [240, 120, 120], fov: 50, far: 500000, near: 1 }}
       >
