@@ -319,7 +319,7 @@ function ThreeDComp({
   return (
     <group position={position}>
       {hostName === systemName && (
-        <AdjacentText displayName={hostName} hostName={hostName} />
+        <AdjacentText displayName={hostName} scale={orbitRad * 17 * sunScale} hostName={hostName} />
       )}
       <BigSphereObj
         scaleRatio={sunScale}
