@@ -15,8 +15,6 @@ import {
   OrbitControls,
   Stars,
   Text,
-  useCursor,
-  useGLTF,
 } from "@react-three/drei";
 import { Line } from "@react-three/drei";
 import * as THREE from "three";
@@ -24,11 +22,9 @@ import { UnrealBloomPass } from "three-stdlib";
 import resultJson from "@/data/result";
 extend({ UnrealBloomPass });
 import { Poppins } from "next/font/google";
-import { useRouter } from "next/navigation";
 import { folder, useControls } from "leva";
 
-const poppinsFont = Poppins({ subsets: ["latin"], weight: "400" });
-const poppinsFont1 = Poppins({ subsets: ["latin"], weight: "500" });
+const poppinsFont = Poppins({ subsets: ["latin"], weight: "500" });
 
 const SPACE_SIZE = 3;
 const ORBIT_TO_SUN = 0.003;
@@ -69,23 +65,30 @@ for (let i = 0; i < LIMIT_VALUE; i++) {
   };
 }
 
-function AdjacentText({ systemName, scale = 17, plaFlag = 0, setPlaOrSun }) {
+function AdjacentText({
+  displayName,
+  hostName,
+  scale = 17,
+  plaFlag = false,
+  setLeva,
+}) {
   const textRef = useRef();
   const textOffset = new THREE.Vector3(
     (scale / 17) * 50,
     (scale / 17) * 30,
     (scale / 17) * -10
-  ); // Example offset to the right of the object
+  );
 
   useFrame(({ camera }) => {
     textRef.current.lookAt(camera.position);
   });
-  const router = useRouter();
   const handleClick = () => {
-    if (plaFlag === 0) {
-      window.open(`/exo-planet-space/planet/${systemName}`, "_blank");
+    if (plaFlag === false) {
+      window.open(`/exo-planet-space/planet/${hostName}`, "_blank");
     } else {
-      setPlaOrSun(1);
+      setLeva({
+        "Change View (Planet/Star)": true,
+      });
     }
   };
 
@@ -93,7 +96,7 @@ function AdjacentText({ systemName, scale = 17, plaFlag = 0, setPlaOrSun }) {
     <Text
       position={textOffset}
       ref={textRef}
-      scale={[scale, scale, scale]} // Adjust scale as needed
+      scale={[scale, scale, scale]}
       color="#cbcbcb"
       anchorX="center"
       anchorY="middle"
@@ -101,7 +104,7 @@ function AdjacentText({ systemName, scale = 17, plaFlag = 0, setPlaOrSun }) {
       cursor="pointer"
       font="/fonts/fox_version_5_by_mickeyfan123_daxvfx5.ttf"
     >
-      {systemName}
+      {displayName}
     </Text>
   );
 }
@@ -110,7 +113,6 @@ function BigSphereObj({
   scaleRatio,
   sunRef,
   setLeva,
-  setPlaOrSun,
   hostName,
   systemName,
   colorMapLoc = "/texture/solar/sun/2k_sun.jpg",
@@ -125,11 +127,13 @@ function BigSphereObj({
     <mesh ref={sunRef}>
       {hostName !== systemName && (
         <Html>
-          <div className={poppinsFont1.className}>
+          <div className={poppinsFont.className}>
             <div
               onClick={() => {
-                setLeva({"Select Planet": systemName});
-                setPlaOrSun(0);
+                setLeva({
+                  "Select Planet": systemName,
+                  "Change View (Planet/Star)": false,
+                });
               }}
               className="text-white text-lg select-none cursor-pointer"
             >
@@ -212,7 +216,7 @@ function OrbitComponent({
   hostName,
   plaName,
   systemName,
-  setPlaOrSun,
+  setLeva,
   zValue = 1,
 }) {
   const ellipseCurve = new THREE.EllipseCurve(
@@ -225,31 +229,27 @@ function OrbitComponent({
     false,
     0
   );
-  const eliRef = useRef();
   const boxRef = useRef();
+  const timeRef = useRef(0);
 
   const points = ellipseCurve.getPoints(500);
   useFrame((state, delta) => {
-    const newP = ellipseCurve.getPoint(
-      window.performance.now() * 0.0003 * speedPla
-    );
+    timeRef.current += delta / 2;
+    const newP = ellipseCurve.getPoint(timeRef.current * speedPla);
     boxRef.current.position.x = newP.x;
     boxRef.current.position.y = newP.y;
   });
   return (
-    <mesh
-      ref={eliRef}
-      position={[0, 0, 0]}
-      rotation={[(Math.PI / 2) * zValue, 0, 0]}
-    >
+    <mesh position={[0, 0, 0]} rotation={[(Math.PI / 2) * zValue, 0, 0]}>
       <mesh ref={boxRef} position={[0, 0, 0]}>
         {hostName === systemName && (
           <mesh>
             <AdjacentText
-              systemName={plaName}
+              displayName={plaName}
+              hostName={hostName}
               scale={5}
-              plaFlag={1}
-              setPlaOrSun={setPlaOrSun}
+              plaFlag={true}
+              setLeva={setLeva}
             />
           </mesh>
         )}
@@ -285,19 +285,19 @@ function ThreeDComp({
   hostName,
   systemName,
   setLeva,
-  setPlaOrSun,
   orbitRad,
   plaName,
 }) {
   const earthOrbit = DISTANCE_FROM_EARTH_TO_SUN * orbitRad;
-  const extractValue = plaOrSun;
   const colorMapLoc1 =
     systemName === "Sun"
       ? "/texture/solar/earth/2k_earth_daymap.jpg"
       : "/texture/solar/mars/2k_mars.jpg";
   return (
     <group position={position}>
-      {hostName === systemName && <AdjacentText systemName={systemName} />}
+      {hostName === systemName && (
+        <AdjacentText displayName={hostName} hostName={hostName} />
+      )}
       <BigSphereObj
         scaleRatio={sunScale}
         sunRef={sunRef}
@@ -305,7 +305,6 @@ function ThreeDComp({
         systemName={systemName}
         setLeva={setLeva}
         plaName={plaName}
-        setPlaOrSun={setPlaOrSun}
       />
       <OrbitComponent
         xRadius={earthOrbit}
@@ -313,25 +312,23 @@ function ThreeDComp({
         colorMapLoc={colorMapLoc1}
         speedPla={0.01}
         scaleRatio={
-          extractValue === 0 ? planetScale * ORBIT_TO_SUN : planetScale
+          plaOrSun === false ? planetScale * ORBIT_TO_SUN : planetScale
         }
         planetRef={planetRef}
         hostName={hostName}
         systemName={systemName}
-        setPlaOrSun={setPlaOrSun}
+        setLeva={setLeva}
         plaName={plaName}
       />
     </group>
   );
 }
 
-function Wrapper3D({ plaOrSun, hostName, setPlaOrSun, setLeva }) {
+function Wrapper3D({ plaOrSun, hostName, setLeva }) {
   const controlsRef = useRef();
   const planetRef = useRef();
   const cameraRef = useRef();
   const sunRef = useRef();
-  const distanceRef = useRef(1);
-  const distanceRef1 = useRef(1);
   const extractValue = plaOrSun;
   const listOfExo = Object.keys(DEFAULT_DATA).slice(0, LIMIT_VALUE);
   const starRef = useRef();
@@ -345,7 +342,7 @@ function Wrapper3D({ plaOrSun, hostName, setPlaOrSun, setLeva }) {
     if (timeRef.current !== null) {
       clearTimeout(timeRef.current);
     }
-    if (extractValue === 1 && planetRef.current && cameraRef.current) {
+    if (plaOrSun === true && planetRef.current && cameraRef.current) {
       const target = new THREE.Vector3();
       const target1 = new THREE.Vector3();
       sunRef.current.getWorldPosition(target1);
@@ -362,33 +359,8 @@ function Wrapper3D({ plaOrSun, hostName, setPlaOrSun, setLeva }) {
   }, [extractValue, hostName]);
 
   useFrame((state, delta) => {
-    if (controlsRef.current && cameraRef.current && sunRef.current) {
-      const target = controlsRef.current.target;
-      const distance = cameraRef.current.position.distanceTo(target);
-      const target1 = new THREE.Vector3();
-      sunRef.current.getWorldPosition(target1);
-      const distance1 = cameraRef.current.position.distanceTo(target1);
-      distanceRef.current = distance;
-      distanceRef1.current = distance1;
-      if (extractValue === 1) {
-        planetRef.current.scale.set(
-          (10 / distance) *
-            DEFAULT_DATA[hostName].pl_size *
-            DEFAULT_DATA[hostName].orbit_distance *
-            DEFAULT_DATA[hostName].sun_size,
-          (10 / distance) *
-            DEFAULT_DATA[hostName].pl_size *
-            DEFAULT_DATA[hostName].orbit_distance *
-            DEFAULT_DATA[hostName].sun_size,
-          (10 / distance) *
-            DEFAULT_DATA[hostName].pl_size *
-            DEFAULT_DATA[hostName].orbit_distance *
-            DEFAULT_DATA[hostName].sun_size
-        );
-      }
-    }
     if (
-      extractValue === 1 &&
+      plaOrSun === true &&
       planetRef.current &&
       controlsRef.current &&
       cameraRef.current
@@ -397,8 +369,24 @@ function Wrapper3D({ plaOrSun, hostName, setPlaOrSun, setLeva }) {
       planetRef.current.getWorldPosition(target);
       controlsRef.current.target.lerp(target, 0.1);
       controlsRef.current.update();
+      const target1 = controlsRef.current.target;
+      const distance = cameraRef.current.position.distanceTo(target1);
+      planetRef.current.scale.set(
+        (10 / distance) *
+          DEFAULT_DATA[hostName].pl_size *
+          DEFAULT_DATA[hostName].orbit_distance *
+          DEFAULT_DATA[hostName].sun_size,
+        (10 / distance) *
+          DEFAULT_DATA[hostName].pl_size *
+          DEFAULT_DATA[hostName].orbit_distance *
+          DEFAULT_DATA[hostName].sun_size,
+        (10 / distance) *
+          DEFAULT_DATA[hostName].pl_size *
+          DEFAULT_DATA[hostName].orbit_distance *
+          DEFAULT_DATA[hostName].sun_size
+      );
     } else if (
-      extractValue === 0 &&
+      plaOrSun === false &&
       sunRef.current &&
       controlsRef.current &&
       starRef.current
@@ -466,10 +454,9 @@ function Wrapper3D({ plaOrSun, hostName, setPlaOrSun, setLeva }) {
           sunScale={DEFAULT_DATA[ele].sun_size}
           hostName={hostName}
           systemName={DEFAULT_DATA[ele].sun_name}
-          setLeva={setLeva}
-          setPlaOrSun={setPlaOrSun}
-          orbitRad={DEFAULT_DATA[ele].orbit_distance}
           plaName={DEFAULT_DATA[ele].pl_name}
+          setLeva={setLeva}
+          orbitRad={DEFAULT_DATA[ele].orbit_distance}
         />
       ))}
     </>
@@ -483,12 +470,13 @@ for (let i = 0; i < LIMIT_VALUE; i++) {
   planetSelect[plaArray[i]] = plaArray[i];
 }
 export default function Home() {
-  const [plaOrSun, setPlaOrSun] = useState(0);
-  const planetOpts = useRef(planetSelect);
   const [leavCont, setLeva] = useControls(() => ({
     "Planet Settings": folder({
       "Select Planet": {
-        options: planetOpts.current,
+        options: planetSelect,
+      },
+      "Change View (Planet/Star)": {
+        value: false,
       },
     }),
   }));
@@ -501,8 +489,7 @@ export default function Home() {
       >
         <Wrapper3D
           hostName={leavCont["Select Planet"]}
-          plaOrSun={plaOrSun}
-          setPlaOrSun={setPlaOrSun}
+          plaOrSun={leavCont["Change View (Planet/Star)"]}
           setLeva={setLeva}
         />
       </Canvas>
