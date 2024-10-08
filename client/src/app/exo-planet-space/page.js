@@ -40,11 +40,25 @@ const DEFAULT_DATA = {
     pl_size: 1,
     sun_size: 1,
     world_position: [0, 0, 0],
+    plaTexture: "/texture/solar/earth/2k_earth_daymap.jpg",
   },
 };
 
+const TEXTURE_PACK = [
+  "/texture/solar/jupiter/2k_jupiter.jpg",
+  "/texture/solar/mars/2k_mars.jpg",
+  "/texture/solar/mercury/2k_mercury.jpg",
+  "/texture/solar/neptune/2k_neptune.jpg",
+  "/texture/solar/saturn/2k_saturn.jpg",
+  "/texture/solar/uranus/2k_uranus.jpg",
+  "/texture/solar/venus/2k_venus_surface.jpg",
+];
+
 for (let i = 0; i < LIMIT_VALUE; i++) {
   const exoSpace = resultJson[i];
+  if (exoSpace["hostname"] === "Sun") {
+    continue;
+  }
   const orbDis = exoSpace["Semi-Major Axis"].replace(" AU", "");
   // % of distance from earth to sun same for below
   const plSize = exoSpace["Planet Radius"].replace(" Earth radii", "");
@@ -52,9 +66,11 @@ for (let i = 0; i < LIMIT_VALUE; i++) {
   const worldPosDis = exoSpace["Distance from Earth"].replace(" parsecs", "");
   const distance = Number(worldPosDis) * 300;
   const theta = Math.random() * 2 * Math.PI;
-  const x = distance * Math.cos(theta);
-  const z = distance * Math.sin(theta);
-  const worldPosition = [x, 0, z];
+  const phi = Math.random() * Math.PI;
+  const x = distance * Math.sin(phi) * Math.cos(theta);
+  const y = distance * Math.cos(phi);
+  const z = distance * Math.sin(phi) * Math.sin(theta);
+  const worldPosition = [x, y, z];
   DEFAULT_DATA[exoSpace["hostname"]] = {
     pl_name: exoSpace["pl_name"],
     sun_name: exoSpace["hostname"],
@@ -62,6 +78,7 @@ for (let i = 0; i < LIMIT_VALUE; i++) {
     pl_size: plSize === "" ? 1 : Number(plSize),
     sun_size: sunSize === "" ? 1 : Number(sunSize),
     world_position: worldPosition,
+    plaTexture: TEXTURE_PACK[Math.floor(Math.random() * TEXTURE_PACK.length)],
   };
 }
 
@@ -76,7 +93,7 @@ function AdjacentText({
   const textOffset = new THREE.Vector3(
     (scale / 17) * 50,
     (scale / 17) * 50,
-    (scale / 17) * -20
+    (scale / 17) * -30
   );
 
   useFrame(({ camera }) => {
@@ -116,6 +133,7 @@ function BigSphereObj({
   hostName,
   systemName,
   displayPlaText,
+  intenLight,
   colorMapLoc = "/texture/solar/sun/2k_sun.jpg",
   emissiveColor = "orange",
 }) {
@@ -149,7 +167,7 @@ function BigSphereObj({
           angle={0.15}
           penumbra={1}
           decay={0}
-          intensity={hostName === systemName ? Math.PI * 0.8 * scaleRatio : 0}
+          intensity={hostName === systemName ? Math.PI * 1.2 * intenLight : 0}
         />
         <sphereGeometry
           args={[SPACE_SIZE * ORBIT_TO_SUN * SUN_RADIUS * scaleRatio, 64, 64]}
@@ -219,6 +237,8 @@ function OrbitComponent({
   systemName,
   setLeva,
   displayPlaText,
+  revolSpeed,
+  plaOrSun,
   zValue = 1,
 }) {
   const ellipseCurve = new THREE.EllipseCurve(
@@ -236,34 +256,36 @@ function OrbitComponent({
 
   const points = ellipseCurve.getPoints(500);
   useFrame((state, delta) => {
-    timeRef.current += delta / 2;
-    const newP = ellipseCurve.getPoint(timeRef.current * speedPla);
-    boxRef.current.position.x = newP.x;
-    boxRef.current.position.y = newP.y;
+    if (boxRef.current) {
+      timeRef.current += delta * 10 * revolSpeed;
+      const newP = ellipseCurve.getPoint(timeRef.current * speedPla);
+      boxRef.current.position.x = newP.x;
+      boxRef.current.position.y = newP.y;
+    }
   });
   return (
     <mesh position={[0, 0, 0]} rotation={[(Math.PI / 2) * zValue, 0, 0]}>
-      <mesh ref={boxRef} position={[0, 0, 0]}>
-        {hostName === systemName && displayPlaText === true && (
-          <mesh>
-            <AdjacentText
-              displayName={plaName}
-              hostName={hostName}
-              scale={5}
-              plaFlag={true}
-              setLeva={setLeva}
-            />
-          </mesh>
-        )}
-        {hostName === systemName && (
+      {hostName === systemName && (
+        <mesh ref={boxRef} position={[0, 0, 0]}>
+          {displayPlaText === true && (
+            <mesh>
+              <AdjacentText
+                displayName={plaName}
+                hostName={hostName}
+                scale={plaOrSun === false ? xRadius * SPACE_SIZE * 0.0001 : 1}
+                plaFlag={true}
+                setLeva={setLeva}
+              />
+            </mesh>
+          )}
           <SmallSphereObj
             colorMapLoc={colorMapLoc}
             scaleRatio={scaleRatio}
             planetRef={planetRef}
             plaName={plaName}
           />
-        )}
-      </mesh>
+        </mesh>
+      )}
       <mesh>
         <Line
           points={points}
@@ -290,12 +312,10 @@ function ThreeDComp({
   orbitRad,
   plaName,
   displayPlaText,
+  revolSpeed,
+  plaTexture,
 }) {
   const earthOrbit = DISTANCE_FROM_EARTH_TO_SUN * orbitRad;
-  const colorMapLoc1 =
-    systemName === "Sun"
-      ? "/texture/solar/earth/2k_earth_daymap.jpg"
-      : "/texture/solar/mars/2k_mars.jpg";
   return (
     <group position={position}>
       {hostName === systemName && (
@@ -309,11 +329,12 @@ function ThreeDComp({
         setLeva={setLeva}
         plaName={plaName}
         displayPlaText={displayPlaText}
+        intenLight={orbitRad * sunScale}
       />
       <OrbitComponent
         xRadius={earthOrbit}
         yRadius={earthOrbit}
-        colorMapLoc={colorMapLoc1}
+        colorMapLoc={plaTexture}
         speedPla={0.01}
         scaleRatio={
           plaOrSun === false ? planetScale * ORBIT_TO_SUN : planetScale
@@ -321,15 +342,25 @@ function ThreeDComp({
         planetRef={planetRef}
         hostName={hostName}
         systemName={systemName}
+        plaOrSun={plaOrSun}
         setLeva={setLeva}
         plaName={plaName}
         displayPlaText={displayPlaText}
+        revolSpeed={revolSpeed}
       />
     </group>
   );
 }
 
-function Wrapper3D({ plaOrSun, hostName, setLeva, zoomSpeed, displayPlaText }) {
+function Wrapper3D({
+  plaOrSun,
+  hostName,
+  setLeva,
+  zoomSpeed,
+  displayPlaText,
+  displayStar,
+  revolSpeed,
+}) {
   const controlsRef = useRef();
   const planetRef = useRef();
   const cameraRef = useRef();
@@ -423,26 +454,28 @@ function Wrapper3D({ plaOrSun, hostName, setLeva, zoomSpeed, displayPlaText }) {
         ref={controlsRef}
         enablePan={false}
         zoomToCursor={true}
-        zoomSpeed={5}
+        zoomSpeed={4}
         rotateSpeed={2}
-        onEnd={() => {
+        onStart={() => {
           stopRef.current = false;
         }}
       />
-      <ambientLight intensity={Math.PI / 20} />
+      <ambientLight intensity={Math.PI / 10} />
       <Effects disableGamma>
         <unrealBloomPass threshold={1} strength={1.0} radius={0.5} />
       </Effects>
       <BakeShadows />
-      <Stars
-        ref={starRef}
-        radius={10000}
-        count={50000}
-        depth={6000}
-        factor={200}
-        fade={true}
-        speed={1}
-      />
+      {displayStar === true && (
+        <Stars
+          ref={starRef}
+          radius={10000}
+          count={20000}
+          depth={6000}
+          factor={200}
+          // fade={true}
+          speed={4}
+        />
+      )}
 
       {listOfExo.map((ele, index) => (
         <ThreeDComp
@@ -458,7 +491,9 @@ function Wrapper3D({ plaOrSun, hostName, setLeva, zoomSpeed, displayPlaText }) {
           plaName={DEFAULT_DATA[ele].pl_name}
           setLeva={setLeva}
           orbitRad={DEFAULT_DATA[ele].orbit_distance}
+          plaTexture={DEFAULT_DATA[ele].plaTexture}
           displayPlaText={displayPlaText}
+          revolSpeed={revolSpeed}
         />
       ))}
     </>
@@ -473,7 +508,7 @@ for (let i = 0; i < LIMIT_VALUE; i++) {
 }
 export default function Home() {
   const [leavCont, setLeva] = useControls(() => ({
-    "Planet Settings": folder({
+    "Universe Settings": folder({
       "Select Planet": {
         options: planetSelect,
       },
@@ -490,8 +525,21 @@ export default function Home() {
         step: 0.01,
       },
     }),
+    "Planet Settings": folder({
+      "Revolution Speed": {
+        value: 0.2,
+        min: 0,
+        max: 1,
+        step: 0.1,
+      },
+    }),
+    "Star Settings": folder({
+      "Display Star": {
+        value: true,
+      },
+    }),
   }));
-  console.log(leavCont);
+  // console.log(leavCont);
   // const listOfExo = Object.keys(DEFAULT_DATA).slice(0, leavCont.size);
   return (
     <main className="h-screen m-[unset] relative bg-slate-950">
@@ -504,6 +552,8 @@ export default function Home() {
           setLeva={setLeva}
           zoomSpeed={leavCont["Speed Of Zoom"]}
           displayPlaText={leavCont["Display Planet Text"]}
+          displayStar={leavCont["Display Star"]}
+          revolSpeed={leavCont["Revolution Speed"]}
         />
       </Canvas>
     </main>
