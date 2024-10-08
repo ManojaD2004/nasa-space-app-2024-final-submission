@@ -34,7 +34,7 @@ const SPACE_SIZE = 3;
 const ORBIT_TO_SUN = 0.003;
 const DISTANCE_FROM_EARTH_TO_SUN = 23479.8304;
 const SUN_RADIUS = 109.2983;
-const LIMIT_VALUE = 20;
+const LIMIT_VALUE = resultJson.length;
 
 const DEFAULT_DATA = {
   Sun: {
@@ -47,7 +47,7 @@ const DEFAULT_DATA = {
   },
 };
 
-for (let i = 0; i < resultJson.length; i++) {
+for (let i = 0; i < LIMIT_VALUE; i++) {
   const exoSpace = resultJson[i];
   const orbDis = exoSpace["Semi-Major Axis"].replace(" AU", "");
   // % of distance from earth to sun same for below
@@ -109,7 +109,7 @@ function AdjacentText({ systemName, scale = 17, plaFlag = 0, setPlaOrSun }) {
 function BigSphereObj({
   scaleRatio,
   sunRef,
-  setHostName,
+  setLeva,
   setPlaOrSun,
   hostName,
   systemName,
@@ -128,7 +128,7 @@ function BigSphereObj({
           <div className={poppinsFont1.className}>
             <div
               onClick={() => {
-                setHostName(systemName);
+                setLeva({"Select Planet": systemName});
                 setPlaOrSun(0);
               }}
               className="text-white text-lg select-none cursor-pointer"
@@ -284,7 +284,7 @@ function ThreeDComp({
   sunScale,
   hostName,
   systemName,
-  setHostName,
+  setLeva,
   setPlaOrSun,
   orbitRad,
   plaName,
@@ -303,8 +303,8 @@ function ThreeDComp({
         sunRef={sunRef}
         hostName={hostName}
         systemName={systemName}
+        setLeva={setLeva}
         plaName={plaName}
-        setHostName={setHostName}
         setPlaOrSun={setPlaOrSun}
       />
       <OrbitComponent
@@ -325,7 +325,7 @@ function ThreeDComp({
   );
 }
 
-function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
+function Wrapper3D({ plaOrSun, hostName, setPlaOrSun, setLeva }) {
   const controlsRef = useRef();
   const planetRef = useRef();
   const cameraRef = useRef();
@@ -466,7 +466,7 @@ function Wrapper3D({ plaOrSun, hostName, setHostName, setPlaOrSun }) {
           sunScale={DEFAULT_DATA[ele].sun_size}
           hostName={hostName}
           systemName={DEFAULT_DATA[ele].sun_name}
-          setHostName={setHostName}
+          setLeva={setLeva}
           setPlaOrSun={setPlaOrSun}
           orbitRad={DEFAULT_DATA[ele].orbit_distance}
           plaName={DEFAULT_DATA[ele].pl_name}
@@ -483,18 +483,15 @@ for (let i = 0; i < LIMIT_VALUE; i++) {
   planetSelect[plaArray[i]] = plaArray[i];
 }
 export default function Home() {
-  const [hostName, setHostName] = useState("Sun");
   const [plaOrSun, setPlaOrSun] = useState(0);
-  const leavCont = useControls({
+  const planetOpts = useRef(planetSelect);
+  const [leavCont, setLeva] = useControls(() => ({
     "Planet Settings": folder({
       "Select Planet": {
-        options: planetSelect,
+        options: planetOpts.current,
       },
-      "Size of Planet (To Render)" : {
-        value: 20, min: 1, max: 98, step: 1
-      }
     }),
-  });
+  }));
   console.log(leavCont);
   // const listOfExo = Object.keys(DEFAULT_DATA).slice(0, leavCont.size);
   return (
@@ -503,10 +500,10 @@ export default function Home() {
         camera={{ position: [240, 120, 120], fov: 50, far: 500000, near: 1 }}
       >
         <Wrapper3D
-          hostName={hostName}
-          setHostName={setHostName}
+          hostName={leavCont["Select Planet"]}
           plaOrSun={plaOrSun}
           setPlaOrSun={setPlaOrSun}
+          setLeva={setLeva}
         />
       </Canvas>
     </main>
